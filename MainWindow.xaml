@@ -7,104 +7,11 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     x:Class="GitGUI.MainWindow"
     mc:Ignorable="d"
-    Title="Git Integration Tool" Height="600" Width="832"
+    Title="Keysight Git Source Control" Height="611" Width="752"
     WindowStartupLocation="CenterScreen"
-    MinHeight="450" MinWidth="800">
+    MinHeight="450" MinWidth="500">
 
     <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="150"/>
-        </Grid.RowDefinitions>
-
-        <!-- 🔹 Repo Info -->
-        <DockPanel Grid.Row="0" Margin="0,0,0,10" LastChildFill="True">
-            <Label Content="Repository:" FontWeight="Bold" VerticalAlignment="Center"/>
-            <TextBox x:Name="RepoPathTextBox" MinWidth="300" Margin="10,0" VerticalAlignment="Center" TextChanged="RepoPathTextBox_TextChanged"/>
-            <Button Content="Browse" Width="100" Margin="10,0,0,0"/>
-        </DockPanel>
-
-        <!-- 🔸 Main Content -->
-        <Grid Grid.Row="1" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="2.5*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- 📊 Commit Graph Panel -->
-            <GroupBox Header="Commit Graph" Grid.Column="0" Margin="5">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="CommitGraphList">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="5">
-                                    <Ellipse Width="10" Height="10" Fill="DarkBlue" Margin="5"/>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Message}" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding Hash}" FontSize="10" Foreground="Gray"/>
-                                        <TextBlock Text="{Binding Date}" FontSize="10" Foreground="DarkGray"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </GroupBox>
-
-            <!-- 📁 File Changes Panel -->
-            <GroupBox Header="Changes" Grid.Column="1" Margin="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <ListBox x:Name="ChangesListBox" Grid.Row="0"/>
-
-                    <WrapPanel Grid.Row="1" Margin="5" HorizontalAlignment="Center">
-                        <Button Content="Stage" Width="75" Margin="5"/>
-                        <Button Content="Unstage" Width="75" Margin="5"/>
-                        <Button Content="View Diff" Width="75" Margin="5"/>
-                    </WrapPanel>
-                </Grid>
-            </GroupBox>
-
-            <!-- 📝 Commit & Branch Panel -->
-            <GroupBox Header="Commit &amp; Branch" Grid.Column="2" Margin="5">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="10">
-                        <TextBlock Text="Commit Message:"/>
-                        <TextBox x:Name="CommitMessageBox" AcceptsReturn="True" Height="60" Margin="0,5"/>
-                        <Button Content="Commit" Width="100" Margin="0,0,0,10"/>
-
-                        <TextBlock Text="Branch:"/>
-                        <ComboBox x:Name="BranchComboBox" Margin="0,5"/>
-                        <WrapPanel Margin="0,5" HorizontalAlignment="Center">
-                            <Button Content="Checkout" Width="100" Margin="5"/>
-                            <Button Content="New Branch" Width="100" Margin="5"/>
-                        </WrapPanel>
-
-                        <WrapPanel Margin="0,5" HorizontalAlignment="Center">
-                            <Button Content="Push" Width="100" Margin="5"/>
-                            <Button Content="Pull" Width="100" Margin="5"/>
-                        </WrapPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </GroupBox>
-        </Grid>
-
-        <!-- 🔻 Output Log -->
-        <GroupBox Header="Output Log" Grid.Row="2" Margin="0,0,0,5">
-            <TextBox x:Name="OutputTextBox"
-                     IsReadOnly="True"
-                     TextWrapping="Wrap"
-                     VerticalScrollBarVisibility="Auto"
-                     HorizontalScrollBarVisibility="Auto"
-                     FontFamily="Consolas"
-                     Background="Black"
-                     Foreground="LightGreen"/>
-        </GroupBox>
+        <Frame Source="Pages/Operation.xaml" x:Name="MainFrame" NavigationUIVisibility="Hidden" />
     </Grid>
 </Window>
