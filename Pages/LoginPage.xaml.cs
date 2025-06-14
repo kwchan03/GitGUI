@@ -25,5 +25,30 @@ namespace GitGUI.Pages
             InitializeComponent();
         }
 
+        private async void GitHubLoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            //var loginPage = new GitHubLoginPage();
+
+            //// Navigate your Frame to the GitHubLoginPage
+            //// Assume your Frame is named "MainFrame" and is accessible via parent window
+            //((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(loginPage);
+
+            //try
+            //{
+            //    // Await the token once the GitHubLoginPage has finished its flow
+            //    string token = await loginPage.GetGitHubAccessTokenAsync();
+
+            //    // Process token, then navigate back or forward to another Page
+            //    MessageBox.Show($"Token: {token}", "Success");
+            //    // For example, navigate back to a DashboardPage:
+            //    ((MainWindow)Application.Current.MainWindow).MainFrame.Navigate(new OperationPage());
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"OAuth failed: {ex.Message}", "Error");
+            //    // Optionally navigate back:
+            //    ((MainWindow)Application.Current.MainWindow).MainFrame.GoBack();
+            //}
+        }
     }
 }

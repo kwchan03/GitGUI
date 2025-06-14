@@ -12,6 +12,6 @@
     MinHeight="450" MinWidth="500">
 
     <Grid Margin="10">
-        <Frame Source="Pages/Operation.xaml" x:Name="MainFrame" NavigationUIVisibility="Hidden" />
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" />
     </Grid>
 </Window>
