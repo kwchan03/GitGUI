@@ -12,9 +12,11 @@ namespace GitGUI.ViewModels
         private readonly IGitService _git;
         public ObservableCollection<CommitInfo> Commits { get; } = new ObservableCollection<CommitInfo>();
         public ObservableCollection<BranchInfo> Branches { get; } = new ObservableCollection<BranchInfo>();
+        public ObservableCollection<ChangeItem> StagedChanges { get; } = new ObservableCollection<ChangeItem>();
+        public ObservableCollection<ChangeItem> UnstagedChanges { get; } = new ObservableCollection<ChangeItem>();
 
-        private string _repoPath = string.Empty;
         private string _outputLog = string.Empty;
+        private string _commitMessage = string.Empty;
         private const int MaxLogLength = 10000; // Maximum number of characters in the log
         private const int MaxLogLines = 1000; // Maximum number of lines in the log
 
@@ -33,7 +35,12 @@ namespace GitGUI.ViewModels
         public ICommand CheckoutBranchCommand { get; }
         public ICommand CreateBranchCommand { get; }
         public ICommand MergeBranchCommand { get; }
-        /// <summary>
+
+        public ICommand RefreshChangesCommand { get; }
+        public ICommand StageCommand { get; }
+        public ICommand UnstageCommand { get; }
+        public ICommand CommitCommand { get; }
+
         /// Command to clear the output log
         /// </summary>
 
@@ -50,24 +57,11 @@ namespace GitGUI.ViewModels
             CheckoutBranchCommand = new RelayCommand(_ => ExecuteCheckoutBranch(), _ => SelectedBranch != null);
             CreateBranchCommand = new RelayCommand(_ => ExecuteCreateBranch(), _ => !string.IsNullOrWhiteSpace(NewBranchName));
             MergeBranchCommand = new RelayCommand(_ => ExecuteMergeBranch(), _ => SelectedBranch != null);
-        }
 
-        /// <summary>
-        /// The folder path of the repository to open or init.
-        /// </summary>
-        public string RepoPath
-        {
-            get => _repoPath;
-            set
-            {
-                if (_repoPath != value)
-                {
-                    _repoPath = value;
-                    OnPropertyChanged();
-                    // Re-evaluate CanExecute for commands that depend on RepoPath
-                    CommandManager.InvalidateRequerySuggested();
-                }
-            }
+            RefreshChangesCommand = new RelayCommand(_ => ExecuteRefreshChanges());
+            StageCommand = new RelayCommand(_ => ExecuteStageFile());
+            UnstageCommand = new RelayCommand(_ => ExecuteUnstageFile());
+            CommitCommand = new RelayCommand(_ => ExecuteCommit(), _ => !string.IsNullOrWhiteSpace(CommitMessage));
         }
 
         private BranchInfo? _selectedBranch;
@@ -98,9 +92,39 @@ namespace GitGUI.ViewModels
             }
         }
 
-        /// <summary>
-        /// A simple log for user feedback.
-        /// </summary>
+        private ChangeItem _selectedChange;
+        public ChangeItem SelectedChange
+        {
+            get => _selectedChange;
+            set
+            {
+                if (_selectedChange != value)
+                {
+                    _selectedChange = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public void SetSelectedChange(ChangeItem changeItem)
+        {
+            SelectedChange = changeItem;
+        }
+
+        public string CommitMessage
+        {
+            get => _commitMessage;
+            set
+            {
+                if (_commitMessage != value)
+                {
+                    _commitMessage = value;
+                    OnPropertyChanged();
+                    // Re-evaluate whether CommitCommand can execute
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
+        }
+
         public string OutputLog
         {
             get => _outputLog;
@@ -152,6 +176,7 @@ namespace GitGUI.ViewModels
                     : $"No repo here, you may want to Create.");
                 ExecuteLoadCommits();
                 ExecuteLoadBranches();
+                ExecuteRefreshChanges();
             }
             catch (Exception ex)
             {
@@ -167,6 +192,7 @@ namespace GitGUI.ViewModels
                 AppendLog($"Created (or opened) repo at '{RepoPath}'.");
                 ExecuteLoadCommits();
                 ExecuteLoadBranches();
+                ExecuteRefreshChanges();
             }
             catch (Exception ex)
             {
@@ -203,10 +229,19 @@ namespace GitGUI.ViewModels
         private void ExecuteCheckoutBranch()
         {
             if (SelectedBranch == null) return;
-            _git.CheckoutBranch(SelectedBranch.Name);
-            AppendLog($"Checked out branch '{SelectedBranch.Name}'.");
-            ExecuteLoadBranches();
-            ExecuteLoadCommits();
+            try
+            {
+                _git.CheckoutBranch(SelectedBranch.Name);
+                AppendLog($"Checked out branch '{SelectedBranch.Name}'.");
+                ExecuteLoadBranches();
+                ExecuteLoadCommits();
+                ExecuteRefreshChanges();
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors (e.g., uncommitted changes)
+                AppendLog($"Error checking out branch: {ex.Message}");
+            }
         }
 
         private void ExecuteCreateBranch()
@@ -215,6 +250,7 @@ namespace GitGUI.ViewModels
             AppendLog($"Created and checked out new branch '{NewBranchName}'.");
             NewBranchName = "";
             ExecuteLoadBranches();
+            ExecuteRefreshChanges();
         }
 
         private void ExecuteMergeBranch()
@@ -224,6 +260,86 @@ namespace GitGUI.ViewModels
             AppendLog($"Merged branch '{SelectedBranch.Name}' into current.");
             ExecuteLoadBranches();
             ExecuteLoadCommits();
+        }
+
+        private void ExecuteStageFile()
+        {
+            if (SelectedChange != null)
+            {
+                try
+                {
+                    _git.StageFile(SelectedChange.FilePath);  // Stage the file
+                    AppendLog($"Staged file: {SelectedChange.FilePath}");
+
+                    // Refresh the changes to reflect the updated state
+                    ExecuteRefreshChanges();  // Refresh the staged and unstaged lists
+                }
+                catch (Exception ex)
+                {
+                    AppendLog($"Error staging file: {ex.Message}");
+                }
+            }
+        }
+
+        // Unstage a file
+        private void ExecuteUnstageFile()
+        {
+            if (SelectedChange != null)
+            {
+                try
+                {
+                    _git.UnstageFile(SelectedChange.FilePath);  // Unstage the file
+                    AppendLog($"Unstaged file: {SelectedChange.FilePath}");
+
+                    // Refresh the changes to reflect the updated state
+                    ExecuteRefreshChanges();  // Refresh the staged and unstaged lists
+                }
+                catch (Exception ex)
+                {
+                    AppendLog($"Error unstaging file: {ex.Message}");
+                }
+            }
+        }
+
+        private void ExecuteCommit()
+        {
+            try
+            {
+                _git.Commit(CommitMessage);
+                AppendLog($"Committed: {CommitMessage}");
+
+                // Clear the message box
+                CommitMessage = string.Empty;
+
+                // Refresh both commits list and changes list
+                ExecuteLoadCommits();
+                ExecuteRefreshChanges();
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Error committing: {ex.Message}");
+            }
+        }
+
+        private void ExecuteRefreshChanges()
+        {
+            StagedChanges.Clear();
+            UnstagedChanges.Clear();
+
+            try
+            {
+                var (stagedChanges, unstagedChanges) = _git.GetChanges();
+                foreach (var change in stagedChanges)
+                    StagedChanges.Add(change);
+                foreach (var change in unstagedChanges)
+                    UnstagedChanges.Add(change);
+
+                AppendLog($"Found {StagedChanges.Count} staged changes and {UnstagedChanges.Count} unstaged changes.");
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Error fetching changes: {ex.Message}");
+            }
         }
 
         private void AppendLog(string message)
