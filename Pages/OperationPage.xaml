@@ -177,68 +177,94 @@
             </GroupBox>
 
             <!-- Commit & Branch Panel -->
-            <GroupBox Header="Commit &amp; Branch" Grid.Column="2" Margin="5">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Grid.Column="2" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Commit box -->
+                    <RowDefinition Height="*"/>
+                    <!-- Branch box -->
+                </Grid.RowDefinitions>
+
+                <!-- ── Commit only ──────────────── -->
+                <GroupBox Header="Commit" Grid.Row="0" Margin="0,0,0,5">
                     <StackPanel Margin="10">
                         <TextBlock Text="Commit Message:"/>
-                        <TextBox x:Name="CommitMessageBox"
-                                 Text="{Binding CommitMessage, UpdateSourceTrigger=PropertyChanged}" 
-                                 AcceptsReturn="True" Height="60" Margin="0,5"/>
-                        <Button Content="Commit" Command="{Binding CommitCommand}" Width="100" Margin="0,5,0,10"/>
-
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5">
-                            <TextBlock Text="Current Branch:" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding CurrentBranch}"
-                                FontWeight="Bold"
-                                Margin="5,0"
-                                Width="135"
-                                VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <ComboBox x:Name="BranchComboBox"
-                            ItemsSource="{Binding Branches}"
-                            SelectedItem="{Binding SelectedBranch}"
-                            DisplayMemberPath="Name"
-                            Margin="0,5"/>
-                        <WrapPanel HorizontalAlignment="Center">
-                            <Button Content="Checkout"
-                                Command="{Binding CheckoutBranchCommand}"
-                                Width="100"
-                                Margin="5"/>
-                            <Button Content="Merge"
-                                Command="{Binding MergeBranchCommand}"
-                                Width="100"
-                                Margin="5"/>
-                        </WrapPanel>
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <!-- TextBox takes all available space -->
-                                <ColumnDefinition Width="*"/>
-                                <!-- Button is auto-sized -->
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBox Grid.Column="0"
-                                Text="{Binding NewBranchName, UpdateSourceTrigger=PropertyChanged}"
-                                Margin="5"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Center"/>
-
-                            <Button Grid.Column="1"
-                                Content="New Branch"
-                                Command="{Binding CreateBranchCommand}"
-                                Width="75"
-                                Margin="5"
-                                VerticalAlignment="Center"/>
-                        </Grid>
-
-                        <WrapPanel HorizontalAlignment="Center">
-                            <Button Content="Push" Width="100" Margin="5"/>
-                            <Button Content="Pull" Width="100" Margin="5"/>
-                        </WrapPanel>
+                        <TextBox Text="{Binding CommitMessage, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True" Height="60" Margin="0,5"/>
+                        <Button Content="Commit"
+                    Command="{Binding CommitCommand}"
+                    Width="100"
+                    HorizontalAlignment="Center"/>
                     </StackPanel>
-                </ScrollViewer>
-            </GroupBox>
+                </GroupBox>
+
+                <!-- ── Branch management ──────────────── -->
+                <GroupBox Header="Branches" Grid.Row="1">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="10">
+
+                            <!-- Current branch indicator -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="Current Branch:"/>
+                                <TextBlock Text="{Binding CurrentBranch}"
+                               FontWeight="Bold" Margin="6,0"/>
+                            </StackPanel>
+
+                            <!-- Branch selector + Checkout -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Column="0"
+                              ItemsSource="{Binding Branches}"
+                              SelectedItem="{Binding SelectedBranch}"
+                              DisplayMemberPath="Name"/>
+                                <Button Grid.Column="1"
+                            Content="Checkout"
+                            Command="{Binding CheckoutBranchCommand}"
+                            Width="80" Margin="6,0"/>
+                            </Grid>
+
+                            <!-- Merge / Delete -->
+                            <WrapPanel HorizontalAlignment="Center">
+                                <Button Content="Merge"
+                            Command="{Binding MergeBranchCommand}"
+                            Width="90" Margin="4"/>
+                                <Button Content="Delete"
+                            Command="{Binding DeleteBranchCommand}"
+                            Width="90" Margin="4"/>
+                            </WrapPanel>
+
+                            <!-- Create new branch -->
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                             Text="{Binding NewBranchName, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,6,0"/>
+                                <Button Grid.Column="1"
+                            Content="New Branch"
+                            Command="{Binding CreateBranchCommand}"
+                            Width="90"/>
+                            </Grid>
+
+                            <!-- Push / Pull -->
+                            <WrapPanel HorizontalAlignment="Center" Margin="0,10,0,0">
+                                <Button Content="Push"
+                            Command="{Binding PushCommand}"
+                            Width="90" Margin="4"/>
+                                <Button Content="Pull"
+                            Command="{Binding PullCommand}"
+                            Width="90" Margin="4"/>
+                            </WrapPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+            </Grid>
         </Grid>
 
         <!-- Output Log -->

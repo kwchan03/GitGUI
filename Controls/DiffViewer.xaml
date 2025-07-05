@@ -9,23 +9,45 @@
     <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="4"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- OLD Version -->
-        <StackPanel Grid.Column="0" Margin="5">
-            <TextBlock Text="Before" FontWeight="Bold" Margin="0,0,0,5"/>
-            <ListBox x:Name="OldLines"/>
+        <!-- OLD version -->
+        <StackPanel Grid.Column="0" Margin="6">
+            <TextBlock Text="Before" FontWeight="Bold" Margin="0,0,0,4"/>
+            <Border Background="LightGray" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="Step: ValidateUser" />
+            </Border>
+            <Border Background="Yellow" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="Timeout: 5s" />
+            </Border>
+            <Border Background="LightCoral" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="Retries: 2" />
+            </Border>
+            <Border Background="Yellow" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="Verdict: Not Set" />
+            </Border>
         </StackPanel>
 
         <!-- Separator -->
-        <Border Grid.Column="1" Width="1" Background="Gray"/>
+        <Border Grid.Column="1" Background="Gray" Width="1"/>
 
-        <!-- NEW Version -->
-        <StackPanel Grid.Column="2" Margin="5">
-            <TextBlock Text="After" FontWeight="Bold" Margin="0,0,0,5"/>
-            <ListBox x:Name="NewLines"/>
+        <!-- NEW version -->
+        <StackPanel Grid.Column="2" Margin="6">
+            <TextBlock Text="After" FontWeight="Bold" Margin="0,0,0,4"/>
+            <Border Background="LightGray" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="Step: ValidateUser" />
+            </Border>
+            <Border Background="Yellow" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="Timeout: 10s" />
+            </Border>
+            <Border Background="Yellow" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="Verdict: Pass if Yes" />
+            </Border>
+            <Border Background="LightGreen" Padding="4" Margin="0,0,0,2">
+                <TextBlock Text="LogLevel: Debug" />
+            </Border>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -15,6 +15,7 @@ namespace GitGUI.ViewModels
         public ObservableCollection<ChangeItem> StagedChanges { get; } = new ObservableCollection<ChangeItem>();
         public ObservableCollection<ChangeItem> UnstagedChanges { get; } = new ObservableCollection<ChangeItem>();
 
+        private string _repoPath = string.Empty;
         private string _outputLog = string.Empty;
         private string _commitMessage = string.Empty;
         private const int MaxLogLength = 10000; // Maximum number of characters in the log
@@ -62,6 +63,24 @@ namespace GitGUI.ViewModels
             StageCommand = new RelayCommand(_ => ExecuteStageFile());
             UnstageCommand = new RelayCommand(_ => ExecuteUnstageFile());
             CommitCommand = new RelayCommand(_ => ExecuteCommit(), _ => !string.IsNullOrWhiteSpace(CommitMessage));
+        }
+
+        /// <summary>
+        /// The folder path of the repository to open or init.
+        /// </summary>
+        public string RepoPath
+        {
+            get => _repoPath;
+            set
+            {
+                if (_repoPath != value)
+                {
+                    _repoPath = value;
+                    OnPropertyChanged();
+                    // Re-evaluate CanExecute for commands that depend on RepoPath
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
         }
 
         private BranchInfo? _selectedBranch;
